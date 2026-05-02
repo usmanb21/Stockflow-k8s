@@ -1,73 +1,117 @@
-# 🚀 Inventory Kubernetes Deployment
+# StockFlow Kubernetes Deployment 🚀
 
-Production-style Kubernetes deployment for a containerized ASP.NET Core Web API with SQL Server.
-
----
+Production-style Kubernetes deployment of the StockFlow ASP.NET Core Web API with SQL Server, running on a local Docker Desktop cluster.
 
 ## 🏗️ Architecture
 
-Client → Ingress → Service → API Pod → SQL Server Pod
+```
+Client
+  ↓
+Kubernetes Service (LoadBalancer)
+  ↓
+API Pod (inventory-api)
+  ↓
+SQL Server Pod
+```
 
----
+## ⚙️ Tech Stack
 
-## 📦 Components
-
-- ASP.NET Core Web API (Dockerized)
-- SQL Server (containerized)
-- Kubernetes (local cluster)
-- NGINX Ingress Controller
-
----
+|Layer        |Technology                        |
+|-------------|----------------------------------|
+|Orchestration|Kubernetes (Docker Desktop)       |
+|API          |ASP.NET Core 8 (Docker Container) |
+|Database     |SQL Server 2022 (Docker Container)|
+|Config       |Kubernetes Secrets & ConfigMaps   |
+|Networking   |Kubernetes Services               |
 
 ## 📁 Project Structure
 
 ```
 k8s/
-  namespace/
-  api/
-  database/
-  ingress/
+├── namespace.yaml       # inventory-app namespace
+├── deployment.yaml      # API deployment config
+├── service.yaml         # Service exposure
+├── secret.yaml          # Database credentials (gitignored)
+└── sqlserver.yaml       # SQL Server deployment
+└── ingress.yaml         # NGINEX ingress configuration
 ```
 
----
+## 🚀 Getting Started
 
-## ⚙️ Deployment Steps
+### Prerequisites
+
+- Docker Desktop with Kubernetes enabled
+- kubectl CLI
+
+### Enable Kubernetes
+
+Docker Desktop → Settings → Kubernetes → Enable Kubernetes
+
+### Deploy
+
+1. Clone the repo
 
 ```bash
-kubectl apply -f k8s/namespace/
-kubectl apply -f k8s/database/
-kubectl apply -f k8s/api/
-kubectl apply -f k8s/ingress/
+git clone https://github.com/usmanb21/Stockflow-k8s.git
+cd Stockflow-k8s
 ```
 
----
+1. Create your secrets file
 
-## 🌐 Access
-
-Add to /etc/hosts:
-
-```
-127.0.0.1 inventory.local
+```bash
+cp k8s/secret.yaml.example k8s/secret.yaml
+# Edit secret.yaml with your actual credentials
 ```
 
-Then open:
+1. Apply all manifests
 
-http://inventory.local
+```bash
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/secret.yaml
+kubectl apply -f k8s/sqlserver.yaml
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+```
 
----
+1. Verify pods are running
 
-## 🛠️ Tech Stack
+```bash
+kubectl get pods -n inventory-app
+```
 
-- Kubernetes
-- Docker
-- ASP.NET Core (.NET 8)
-- SQL Server
-- NGINX Ingress
+1. Access the API
 
----
+```bash
+kubectl port-forward service/inventory-api-service 8080:80 -n inventory-app
+```
 
-## 📌 Notes
+Then open: <http://localhost:8080/swagger>
 
-- Uses ClusterIP service for internal communication
-- Ingress routes external traffic
-- Environment variables used for DB connection
+## 🔒 Secrets
+
+`secret.yaml` is gitignored for security. Create it locally:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sql-secret
+  namespace: inventory-app
+type: Opaque
+stringData:
+  SA_PASSWORD: "<your-sa-password>"
+  ConnectionString: "Server=sqlserver;Database=InventoryDb;User Id=sa;Password=<your-sa-password>;TrustServerCertificate=True"
+```
+
+## ✅ Features
+
+- Kubernetes namespace isolation
+- Kubernetes Secrets for credential management
+- SQL Server running as a pod
+- API auto-connects and runs EF Core migrations on startup
+- Port-forward for local access
+
+## 👤 Author
+
+**Usman**
+[LinkedIn](https://www.linkedin.com/in/usman-zahid-butt-353a9430)
