@@ -114,7 +114,24 @@ stringData:
 - API auto-connects and runs EF Core migrations on startup
 - Port-forward for local access
 
-## 👤 Author
+## 🔄 Request Flow
 
+Client → Ingress → Kubernetes Service → API Pod (:8080) → SQL Server Pod
+
+## 🚀 Deployment Steps
+
+```bash
+# Apply all Kubernetes manifests
+kubectl apply -f k8s/
+
+# Verify pods are running
+kubectl get pods -n inventory-app
+
+# Access the API locally
+kubectl port-forward svc/inventory-api 8080:80 -n inventory-app
+
+
+
+## 👤 Author
 **Usman**
 [LinkedIn](https://www.linkedin.com/in/usman-zahid-butt-353a9430)
