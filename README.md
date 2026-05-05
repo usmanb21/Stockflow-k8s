@@ -4,6 +4,8 @@ Production-style Kubernetes deployment of the StockFlow ASP.NET Core Web API wit
 
 ## 🏗️ Architecture
 
+![Architecture](docs/stockflow-k8s-architecture.svg)
+
 ```
 Client
   ↓
