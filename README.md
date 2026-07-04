@@ -6,15 +6,6 @@ Production-style Kubernetes deployment of the StockFlow ASP.NET Core Web API wit
 
 ![Architecture](docs/stockflow-k8s-architecture.svg)
 
-```
-Client
-  ↓
-Kubernetes Service (LoadBalancer)
-  ↓
-API Pod (inventory-api)
-  ↓
-SQL Server Pod
-```
 
 ## ⚙️ Tech Stack
 
